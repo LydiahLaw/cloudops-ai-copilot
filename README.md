@@ -1,6 +1,6 @@
 # CloudOps AI Copilot
 
-An AI-powered SRE incident assistant that uses Retrieval-Augmented Generation (RAG) to diagnose infrastructure incidents against a set of operational runbooks, with remediation and validation steps rendered directly from source text never generated or paraphrased by the model.
+An AI-powered SRE incident assistant that uses Retrieval-Augmented Generation to diagnose infrastructure incidents against operational runbooks. Remediation and validation steps are rendered directly from source text rather than generated or paraphrased by the model.
 
 This is a focused prototype/MVP, not a production incident-management platform. It demonstrates RAG architecture, local LLM deployment, and a deliberately conservative approach to grounding: the LLM writes only a short diagnosis, while all actionable steps are extracted deterministically in Python.
 
@@ -35,7 +35,7 @@ This is a focused prototype/MVP, not a production incident-management platform. 
 SRE and DevOps teams rely on runbooks to diagnose recurring infrastructure incidents, but manually searching documentation during an active incident is slow. This project explores whether a small, locally-run LLM combined with a RAG pipeline can:
 
 - Retrieve the correct runbook for a described incident
-- Present remediation and validation steps that are guaranteed to match the source runbook exactly, with no risk of the model paraphrasing, omitting, or fabricating a step
+- Present remediation and validation steps extracted directly from the selected runbook, preventing the LLM from paraphrasing, omitting or fabricating actionable instructions.
 - Generate a short, safety-checked diagnosis explaining the likely cause
 - Safely decline to answer when no runbook covers the incident
 
@@ -68,7 +68,7 @@ Python deterministically extracts all Remediation + Validation lines
        ↓
 Ollama LLM (qwen2.5:1.5b-instruct) generates ONLY a short diagnosis
        ↓
-Safety check strips any command/URL that leaks into the diagnosis
+Safety check replaces the diagnosis with a generic fallback if a command or URL is detected
        ↓
 Diagnosis + exact runbook steps + citations, displayed in Streamlit
 ```
@@ -246,7 +246,7 @@ Retrieval selected the expected runbook for every query in this hand-built evalu
 
 Because remediation and validation steps are now extracted deterministically once the correct runbook is identified — rather than selected by the LLM — the *content* of the response (which steps appear, and in what order) is identical on every run for a given query. Only the short diagnosis sentence varies in wording between runs; the actionable content does not.
 
-This is a small, hand-built evaluation set (7 queries across 3 runbooks) sufficient to demonstrate the retrieval and extraction mechanism working correctly not a claim of production-scale accuracy. See [Future Improvements](#future-improvements) for planned expansion.
+This is a small, hand-built evaluation set seven queries across three runbooks; sufficient to demonstrate the retrieval and extraction mechanism. It is not a claim of production-scale accuracy. See [Future Improvements](#future-improvements) for planned expansion.
 
 
 
